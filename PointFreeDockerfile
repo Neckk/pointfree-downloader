@@ -1,0 +1,37 @@
+FROM node:alpine as downloader
+
+RUN apk --no-cache add \
+    git \
+    make \
+    zip
+
+RUN mkdir /code
+WORKDIR /code
+RUN git clone https://github.com/ytdl-org/youtube-dl && cd youtube-dl && git checkout f7ce98a
+RUN make youtube-dl
+RUN mv youtube-dl /
+
+FROM node:alpine
+
+RUN apk --no-cache add \
+    youtube-dl \
+    py3-pip \
+    ffmpeg \
+  && pip3 install requests bs4 pydrive2
+
+ENV MOVIES_DIR=/downloads
+ENV SCRIPTS_DIR=/scripts
+ENV APPDATA=/appdata
+
+RUN mkdir -p $MOVIES_DIR $SCRIPTS_DIR $APPDATA
+
+# VOLUME $MOVIES_DIR
+# VOLUME $APPDATA
+
+WORKDIR $SCRIPTS_DIR
+COPY grab.py cookies.py GoogleDriveWrapper.py ./
+COPY --from=downloader /youtube-dl /usr/bin/
+
+ENTRYPOINT ln -s $APPDATA/* ./ && python3 grab.py --no-gdrive-upload
+# ENTRYPOINT /bin/sh
+

@@ -32,7 +32,7 @@ class Strategy:
 class PointFreeStrategy(Strategy):
     def __init__(self):
         self.BASE_URL = 'https://www.pointfree.co/'
-        self.VIDEOS_DIR = '~/Movies/PointFree'
+        self.VIDEOS_DIR = '/downloads'
         self.GDRIVE_PATH = 'Screencasts/PointFree'
         self.cookieFileName = 'cookies-pointfree.txt'
         self.loadCookies()
